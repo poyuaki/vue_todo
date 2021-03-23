@@ -12,118 +12,15 @@
             <b-col md>
                 <div>
                   <b-button
-                    size="sm"
-                    block
+                    aria-controls="sidebar-details"
+                    v-b-toggle.sidebar-details
+                    @click="viewDetails(content.keys)"
                     variant="outline-info"
-                    :aria-controls="'sidebar-details-' + content.keys"
-                    aria-expanded="true"
-                    @click="content.viewDetails = true"
+                    block
+                    size="sm"
                   >
-                    詳細
+                  詳細<b-icon-chat-text class="ml-2"/>
                   </b-button>
-                  <b-sidebar
-                    :id="'sidebar-details-' + content.keys"
-                    :aria-labelledby="'sidebar-details-' + content.keys"
-                    :visible="content.viewDetails"
-                    no-header
-                    shadow
-                    backdrop-variant="dark"
-                    backdrop
-                  >
-                    <template #default="{ hide }">
-                      <div class="p-2">
-                        <h3 :id="'sidebar-details-' + content.keys" class="sidebar-title">{{content.contents}}</h3>
-                      </div>
-                      <div class="importance-star">
-                        <div v-if="content.importance == 5">
-                          <b-icon-star-fill></b-icon-star-fill>
-                          <b-icon-star-fill></b-icon-star-fill>
-                          <b-icon-star-fill></b-icon-star-fill>
-                          <b-icon-star-fill></b-icon-star-fill>
-                          <b-icon-star-fill></b-icon-star-fill>
-                        </div>
-                        <div v-else-if="content.importance == 4">
-                          <b-icon-star></b-icon-star>
-                          <b-icon-star-fill></b-icon-star-fill>
-                          <b-icon-star-fill></b-icon-star-fill>
-                          <b-icon-star-fill></b-icon-star-fill>
-                          <b-icon-star-fill></b-icon-star-fill>
-                        </div>
-                        <div v-else-if="content.importance == 3">
-                          <b-icon-star></b-icon-star>
-                          <b-icon-star></b-icon-star>
-                          <b-icon-star-fill></b-icon-star-fill>
-                          <b-icon-star-fill></b-icon-star-fill>
-                          <b-icon-star-fill></b-icon-star-fill>
-                        </div>
-                        <div v-else-if="content.importance == 2">
-                          <b-icon-star></b-icon-star>
-                          <b-icon-star></b-icon-star>
-                          <b-icon-star></b-icon-star>
-                          <b-icon-star-fill></b-icon-star-fill>
-                          <b-icon-star-fill></b-icon-star-fill>
-                        </div>
-                        <div v-else-if="content.importance == 1">
-                          <b-icon-star></b-icon-star>
-                          <b-icon-star></b-icon-star>
-                          <b-icon-star></b-icon-star>
-                          <b-icon-star></b-icon-star>
-                          <b-icon-star-fill></b-icon-star-fill>
-                        </div>
-                        <div v-else-if="content.importance == 0">
-                          <b-icon-star></b-icon-star>
-                          <b-icon-star></b-icon-star>
-                          <b-icon-star></b-icon-star>
-                          <b-icon-star></b-icon-star>
-                          <b-icon-star></b-icon-star>
-                        </div>
-                      </div>
-                      <div class="mb-1 viewDate">
-                        <p class="mb-0">{{content.viewDate | isViewDateNaN}}</p>
-                      </div>
-                      <div class="diff">
-                        <p>{{content.diff | isDiffNaN}}</p>
-                      </div>
-                      <div class="comment">
-                        <p>{{content.comment}}</p>
-                      </div>
-                      <div class="mb-3">
-                        <b-container class="mb-3">
-                          <b-row>
-                            <b-col cols="6">
-                              <b-button
-                                variant="outline-primary"
-                                @click="changeText(content.keys)"
-                                class="pl-2 pr-2"
-                                block
-                              >
-                                変更
-                              </b-button>
-                            </b-col>
-                            <b-col cols="6">
-                              <b-button
-                                variant="success"
-                                @click="deleteText(content.keys)"
-                                class="pl-2 pr-2"
-                                block
-                              >
-                                完了
-                                <b-icon-clipboard-check/>
-                              </b-button>
-                            </b-col>
-                          </b-row>
-                        </b-container>
-                        <b-button
-                          variant="outline-info"
-                          @click="hide;content.viewDetails = false"
-                          block
-                          class="mt-2"
-                        >
-                          閉じる
-                        </b-button>
-                      </div>
-                    </template>
-                  </b-sidebar>
                 </div>
               </b-col>
             </b-row>
@@ -162,11 +59,8 @@ export default {
         }
     },
     methods:{
-        deleteText(value){
-            this.$emit('user-delete-todo',value)
-        },
-        changeText(value){
-            this.$emit('user-change-todo',value)
+        viewDetails(value){
+          this.$emit('user-details-todo',value)
         }
     }
 }

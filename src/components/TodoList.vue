@@ -7,29 +7,35 @@
                     @user-enter-todo="addTextToList"
                     @now-user-input="setInput"
                 />
-                <b-container fluid>
+                <b-container class="mt-4 mb-2">
                     <b-row>
-                        <b-col md="9">
+                        <b-col col="6" class="text-center">
+                          <div class="sort">
+                            <b-dropdown id="dropdown-sort" variant="outline-primary">
+                              <template #button-content>
+                                <b-icon-clipboard-data/>ソート順
+                              </template>
+                              <b-dropdown-item :active="sortActive" @click="sortBy('period')"><b-icon-calendar class="mr-1"/>日付優先</b-dropdown-item>
+                              <b-dropdown-item :active="!sortActive" @click="sortBy('importance')"><b-icon-exclamation class="mr-1"/>重要度優先</b-dropdown-item>
+                            </b-dropdown>
+                          </div>
                         </b-col>
-                        <b-col md="3">
-                            <div style="text-align: center;">
-                                <b-button
-                                    variant="outline-warning"
-                                    @click="logOut()"
-                                    class="pl-2 pr-2 mb-3 mt-3"
-                                    size="sm"
-                                >
-                                ログアウト
-                                <b-icon-box-arrow-right></b-icon-box-arrow-right>
-                                </b-button>
-                            </div>
+                        <b-col col="6" class="text-center">
+                          <b-button
+                            variant="outline-warning"
+                            @click="logOut()"
+                            class="pl-2 pr-2"
+                            size="sm"
+                          >
+                            ログアウト
+                            <b-icon-box-arrow-right/>
+                          </b-button>
                         </b-col>
                     </b-row>
                 </b-container>
                 <view-todo
                     :user-todo="textList"
-                    @user-delete-todo="deleteText"
-                    @user-change-todo="changeText"
+                    @user-details-todo="viewDetails"
                 />
                 <error-alert
                     :error-color="errorObj.color"
@@ -48,6 +54,96 @@
                     >
                         完了しました!<a @click="backDelete()" class="alert-link ml-3">元に戻す</a>
                     </b-alert>
+                </div>
+                <div class="sidebar">
+                  <b-sidebar
+                    id='sidebar-details'
+                    shadow
+                    backdrop-variant="dark"
+                    backdrop
+                    :title="detail.contents"
+                  >
+                    <div class="importance-star">
+                      <div v-if="detail.importance == 5">
+                        <b-icon-star-fill/>
+                        <b-icon-star-fill/>
+                        <b-icon-star-fill/>
+                        <b-icon-star-fill/>
+                        <b-icon-star-fill/>
+                      </div>
+                      <div v-else-if="detail.importance == 4">
+                        <b-icon-star/>
+                        <b-icon-star-fill/>
+                        <b-icon-star-fill/>
+                        <b-icon-star-fill/>
+                        <b-icon-star-fill/>
+                      </div>
+                      <div v-else-if="detail.importance == 3">
+                        <b-icon-star/>
+                        <b-icon-star/>
+                        <b-icon-star-fill/>
+                        <b-icon-star-fill/>
+                        <b-icon-star-fill/>
+                      </div>
+                      <div v-else-if="detail.importance == 2">
+                        <b-icon-star></b-icon-star>
+                        <b-icon-star></b-icon-star>
+                        <b-icon-star></b-icon-star>
+                        <b-icon-star-fill/>
+                        <b-icon-star-fill/>
+                      </div>
+                      <div v-else-if="detail.importance == 1">
+                        <b-icon-star/>
+                        <b-icon-star/>
+                        <b-icon-star/>
+                        <b-icon-star/>
+                        <b-icon-star-fill/>
+                      </div>
+                      <div v-else-if="detail.importance == 0">
+                        <b-icon-star/>
+                        <b-icon-star/>
+                        <b-icon-star/>
+                        <b-icon-star/>
+                        <b-icon-star/>
+                      </div>
+                    </div>
+                    <div class="mb-1 viewDate">
+                      <p class="mb-0">{{detail.viewDate | isViewDateNaN}}</p>
+                    </div>
+                    <div class="diff">
+                      <p>{{detail.diff | isDiffNaN}}</p>
+                    </div>
+                    <div class="comment pl-2 pr-2">
+                      <p>{{detail.comment}}</p>
+                    </div>
+                    <div class="mb-3">
+                      <b-container class="mb-3">
+                        <b-row>
+                          <b-col cols="6">
+                            <b-button
+                              variant="outline-primary"
+                              @click="changeText(detail.keys)"
+                              class="pl-2 pr-2"
+                              block
+                            >
+                              変更
+                            </b-button>
+                          </b-col>
+                          <b-col cols="6">
+                            <b-button
+                              variant="success"
+                              @click="deleteText(detail.keys)"
+                              class="pl-2 pr-2"
+                              block
+                            >
+                              完了
+                              <b-icon-clipboard-check/>
+                            </b-button>
+                          </b-col>
+                        </b-row>
+                      </b-container>
+                    </div>
+                  </b-sidebar>
                 </div>
             </div>
         </transition>
@@ -69,6 +165,9 @@ export default {
         },
         canViewTodo:{
             type: Boolean
+        },
+        sortType:{
+          type: String
         }
     },
     data(){
@@ -97,6 +196,19 @@ export default {
                 color: '',
                 message: '',
                 count: 0
+            },
+            sortObj:{
+              isPeriod: true,
+              sortType: this.sortType
+            },
+            detail:{
+              keys: 0,
+              contents: '',
+              importance: 0,
+              comment: '',
+              period: '',
+              viewDate: '',
+              diff: ''
             }
         }
     },
@@ -211,6 +323,15 @@ export default {
         },
         errorFinish(value){
             if(value) this.errorObj.count = 0
+        },
+        sortBy(sortType){
+          this.$emit('sort-type-name', sortType)
+          if(sortType == "period") this.sortObj.isPeriod = true
+          else if(sortType == "importance") this.sortObj.isPeriod = false
+        },
+        viewDetails(value){
+          let index = this.textList.findIndex(item => item.keys === value)
+          this.detail = this.textList[index]
         }
     },
     computed:{
@@ -218,6 +339,12 @@ export default {
             this.$emit('todo-len',this.textList.length)
             if(this.textList.length) return "追加"
             else return "新規"
+        },
+        sortActive(){
+          let sortType = this.sortObj.sortType
+          if(sortType == "period") this.sortObj.isPeriod = true
+          else if(sortType == "importance") this.sortObj.isPeriod = false
+          return this.sortObj.isPeriod
         }
     }
 }

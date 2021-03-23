@@ -7,7 +7,7 @@
                 size="lg"
                 @click="handleSignIn()"
             >
-                <b-icon-google></b-icon-google>
+                <b-icon-google/>
                 Googleアカウントでログイン
             </b-button>
         </div>
@@ -52,7 +52,9 @@ export default {
                     return null
                 }
                 let id = googleUser.getId()
-                let userImg = googleUser.getBasicProfile().zI
+                let user = googleUser.getBasicProfile()
+                let userImg = user.getImageUrl()
+                if(!userImg) userImg = "./assets/logo.png"
                 let data = {
                     idtoken: id,
                     userimg: userImg
@@ -68,7 +70,7 @@ export default {
                 .then(response => {
                 })
                 this.$set(this.loginSuccess, 'isSuccess', 'ok')
-                this.$set(this.loginSuccess, 'userImg',googleUser.getBasicProfile().zI)
+                this.$set(this.loginSuccess, 'userImg',userImg)
                 this.$emit('login-success',this.loginSuccess)
             } catch (error) {
                 this.errorObj.color = 'danger'
