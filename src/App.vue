@@ -15,10 +15,12 @@
           />
           <todo-list
             @todo-len="headerSub"
-            v-if="(bool.isLogin || isAlreadyLogin) && !isSetting"
+            v-if="(bool.isLogin || isAlreadyLogin) && !isSetting && sortReload"
             :todo-list="textList"
+            :sort-type="sortType"
             :can-view-todo="isCanView"
             @user-change-todo="settingText"
+            @sort-type-name="sortTodo"
           />
           <login-view
             v-if="!(bool.isLogin || isAlreadyLogin) && !isSetting"
@@ -55,7 +57,9 @@ export default {
       isFadeIn: false,
       isCanView: false,
       isSetting: false,
-      changeTodo: null       //変更する時用の配列
+      changeTodo: null,       //変更する時用の配列
+      sortType: 'period',
+      sortReload: true
     }
   },
   computed:{
@@ -81,7 +85,7 @@ export default {
       if(value.isSuccess == "ok"){
         this.$set(this.bool, 'isLogin', true)
         this.$set(this.message, 'userImg', value.userImg)
-        this.addTextList()
+        this.addTextList(this.sortType)
       }
     },
     settingText(value){
@@ -94,15 +98,16 @@ export default {
       this.isSetting = false
       if(value){
         this.textList = []
-        this.addTextList()
+        this.addTextList(this.sortType)
       }else{
         this.isCanView = true
       }
     },
-    addTextList(){
+    addTextList(type = 'period'){
+      this.textList = []
       setTimeout(() => {
         let that = this
-        let request = new Request("./php/setText.php")
+        let request = new Request("./php/setText.php?sortType="+type)
         fetch(request)
         .then(function(response){
           if(!response.ok) throw new Error("HTTP error! statue:" + response.status)
@@ -164,9 +169,17 @@ export default {
             }
             that.textList.push(obj)
           }
+          console.log(that.textList)
           that.isCanView = true
+          that.sortReload = true
         })
       }, 1000);
+    },
+    sortTodo(value){
+      this.isCanView = false
+      this.sortReload = false
+      this.sortType = value
+      this.addTextList(value)
     }
   },
   mounted(){

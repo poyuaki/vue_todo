@@ -4,7 +4,19 @@ import Vue from 'vue'
 import App from './App'
 import router from './route.js'
 import GAuth from 'vue-google-oauth2'
-import {BootstrapVue, BIcon, BIconStar, BIconStarFill, BIconGoogle, BIconBoxArrowRight, BIconClipboardPlus, BIconClipboardCheck} from 'bootstrap-vue'
+import {BootstrapVue,
+        BIcon,
+        BIconStar,
+        BIconStarFill,
+        BIconGoogle,
+        BIconBoxArrowRight,
+        BIconClipboardPlus,
+        BIconClipboardCheck,
+        BIconClipboardData,
+        BIconExclamation,
+        BIconCalendar,
+        BIconChatText
+        } from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 
@@ -16,6 +28,10 @@ Vue.component('BIconGoogle',BIconGoogle)
 Vue.component('BIconBoxArrowRight',BIconBoxArrowRight)
 Vue.component('BIconClipboardPlus',BIconClipboardPlus)
 Vue.component('BIconClipboardCheck',BIconClipboardCheck)
+Vue.component('BIconClipboardData',BIconClipboardData)
+Vue.component('BIconExclamation',BIconExclamation)
+Vue.component('BIconCalendar',BIconCalendar)
+Vue.component('BIconChatText',BIconChatText)
 
 Vue.config.productionTip = false
 Vue.use(GAuth, {
