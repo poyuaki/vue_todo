@@ -35,7 +35,7 @@ Vue.component('BIconChatText',BIconChatText)
 
 Vue.config.productionTip = false
 Vue.use(GAuth, {
-  clientId: '240452811352-34mkkl305a9bo3ar2hi67j7b6kdstrj4.apps.googleusercontent.com', scope: 'email profile openid', prompt: 'select_account'
+  clientId: '####', scope: 'email profile openid', prompt: 'select_account'
 })
 
 /* eslint-disable no-new */
